@@ -39,6 +39,7 @@ class ServiceController extends Controller
         ]);
         
         $service = new service;
+        $service->parent_id = 0;
         $service->service_name_english = $request->service_name_english;
         $service->service_name_arabic = $request->service_name_arabic;
         $service->type = $request->type;

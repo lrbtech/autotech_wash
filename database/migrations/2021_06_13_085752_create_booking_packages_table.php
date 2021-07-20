@@ -17,7 +17,8 @@ class CreateBookingPackagesTable extends Migration
             $table->id();
             $table->string('booking_id')->nullable();
             $table->string('package_id')->nullable();
-            $table->string('package_name')->nullable();
+            $table->string('package_name_english')->nullable();
+            $table->string('package_name_arabic')->nullable();
             $table->string('price')->default('0');
             $table->string('status')->default('0');
             $table->timestamps();

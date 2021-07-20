@@ -10,6 +10,7 @@ use App\customer;
 use App\booking;
 use App\reviews;
 use Auth;
+use DB;
 
 class HomeController extends Controller
 {
@@ -27,7 +28,10 @@ class HomeController extends Controller
   
         $booking = booking::whereBetween('date', [$cfdate, $cldate])->where('shop_id',Auth::user()->user_id)->count();
         $booking_value = booking::whereBetween('date', [$cfdate, $cldate])->where('shop_id',Auth::user()->user_id)->get()->sum("total");
-        $customer = customer::whereBetween('date', [$cfdate, $cldate])->count();
+        $customer = DB::table('bookings as b')
+        ->where('b.shop_id',Auth::user()->user_id)
+        ->join('customers as c', 'c.id', '=', 'b.customer_id')
+        ->count();
         $reviews = reviews::whereBetween('date', [$cfdate, $cldate])->where('shop_id',Auth::user()->user_id)->count();
 
         return view('agent.dashboard',compact('booking','booking_value','reviews','customer'));

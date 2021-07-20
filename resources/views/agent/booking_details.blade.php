@@ -54,6 +54,12 @@
                 <div class="mt-1">{{$customer->mobile}}</div>
                 <div class="mt-1">{{$booking->address}}</div>
             </div>
+            <div class="mt-10 lg:mt-0 lg:ml-auto">
+                <div class="text-base text-gray-600">Vehicle Details</div>
+                <div class="text-lg font-medium text-theme-1 mt-2">{{$vehicle->brand}} {{$vehicle->vehicle_name}}</div>
+                <div class="mt-1">{{$colour->name}}</div>
+                <div class="mt-1">{{$vehicle->registration_city}} {{$vehicle->registration_code}} {{$vehicle->registration_number}}</div>
+            </div>
             <div class="mt-10 lg:mt-0 lg:ml-auto lg:text-right">
                 <div class="text-base text-gray-600">Receipt</div>
                 <div class="text-lg text-theme-1 font-medium mt-2">#{{$booking->booking_id}}</div>
@@ -121,8 +127,8 @@
                         <tr>
                             <td class="text-right border-b w-32"></td>
                             <td class="text-right border-b w-32"></td>
-                            <td class="text-right border-b w-32">{{$booking->coupon_code}}</td>
-                            <td class="text-right border-b w-32 font-medium">AED {{$booking->coupon_value}}</td>
+                            <td style="color:green;" class="text-right border-b w-32">Discount({{$booking->coupon_code}})</td>
+                            <td style="color:green;" class="text-right border-b w-32 font-medium">AED {{$booking->coupon_value}}</td>
                         </tr>        
                         @endif            
                     </tbody>

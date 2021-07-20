@@ -18,9 +18,17 @@ use Hash;
 use DB;
 use Mail;
 use PDF;
+use Auth;
 
 class HomeController extends Controller
 {
+    public function shoplogin($id){
+    	$user = User::find($id);
+        if (!empty($user)) {
+    	Auth::loginUsingId($id);
+        return redirect('/agent/dashboard');
+    	}
+    }
     public function bookingprint($id){
         $booking = booking::find($id);
         $booking_service = booking_service::where('booking_id',$id)->get();

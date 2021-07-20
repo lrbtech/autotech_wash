@@ -17,7 +17,8 @@ class CreateBookingProductsTable extends Migration
             $table->id();
             $table->string('booking_id')->nullable();
             $table->string('product_id')->nullable();
-            $table->string('product_name')->nullable();
+            $table->string('product_name_english')->nullable();
+            $table->string('product_name_arabic')->nullable();
             $table->string('price')->default('0');
             $table->string('status')->default('0');
             $table->timestamps();

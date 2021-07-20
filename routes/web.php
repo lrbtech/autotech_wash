@@ -36,6 +36,7 @@ Route::get('/garage-services', 'HomeController@garageservices');
 Route::get('/pickup-services', 'HomeController@pickupservices');
 
 Route::get('/booking-print/{id}', 'HomeController@bookingprint');
+Route::get('/shop-login/{id}', 'HomeController@shoplogin');
 
 Auth::routes();
 

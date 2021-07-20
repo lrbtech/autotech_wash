@@ -15,6 +15,35 @@
                 <div class="mt-3">
                     <div class="sm:grid grid-cols-2 gap-6">
                         <div class="relative mt-2">
+                          <label>Select Service</label>
+                          <select multiple class="select2 w-full" name="service_ids[]" id="service_ids">
+                          <?php
+                          $arraydata=array();
+                          foreach(explode(',',$profile->service_ids) as $service_id){
+                            $arraydata[]=$service_id;
+                          }
+                          ?>
+                          @foreach ($service as $value)
+                            @if(in_array($value->id , $arraydata))
+                              <option selected value="{{$value->id}}">{{$value->service_name_english}}</option>
+                            @else
+                              <option value="{{$value->id}}">{{$value->service_name_english}}</option>
+                            @endif
+                          @endforeach
+                          </select>
+                        </div>
+                        <div class="relative mt-2">
+                          <label>Other Service</label>
+                          <select class="input w-full border mt-2" name="other_service" id="other_service">
+                            <option {{ ($profile->other_service == '0' ? ' selected' : '') }} value="0">Home Services</option>
+                            <option {{ ($profile->other_service == '1' ? ' selected' : '') }} value="1">Visitus</option>
+                          </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="sm:grid grid-cols-2 gap-6">
+                        <div class="relative mt-2">
                           <label>Busisness Name</label>
                           <input value="{{$profile->busisness_name}}" type="text" class="input w-full border mt-2" name="busisness_name" id="busisness_name">
                         </div>
@@ -45,6 +74,41 @@
                         <div class="relative mt-2">
                           <label>About Us Arabic</label>
                           <textarea rows="5" class="input w-full border mt-2" name="about_us_arabic" id="about_us_arabic">{{$profile->about_us_arabic}}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <div class="sm:grid grid-cols-2 gap-6">
+                        <div class="relative mt-2">
+                          <label>Profile Image</label>
+                          <input type="file" class="input w-full border mt-2" name="profile_image" id="profile_image">
+                          <img style="width:200px;" src="/upload_files/{{$profile->profile_image}}">
+                        </div>
+                        <div class="relative mt-2">
+                          <label>Cover Image</label>
+                          <input type="file" class="input w-full border mt-2" name="cover_image" id="cover_image">
+                          <img style="width:200px;" src="/upload_files/{{$profile->cover_image}}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <div class="sm:grid grid-cols-3 gap-5">
+                        <div class="relative mt-2">
+                          <label>Passport Copy</label>
+                          <input type="file" class="input w-full border mt-2" name="passport_copy" id="passport_copy">
+                          <img style="width:200px;" src="/upload_files/{{$profile->passport_copy}}">
+                        </div>
+                        <div class="relative mt-2">
+                          <label>Trade License</label>
+                          <input type="file" class="input w-full border mt-2" name="trade_license" id="trade_license">
+                          <img style="width:200px;" src="/upload_files/{{$profile->trade_license}}">
+                        </div>
+                        <div class="relative mt-2">
+                          <label>Emirated Id Copy</label>
+                          <input type="file" class="input w-full border mt-2" name="emirated_id_copy" id="emirated_id_copy">
+                          <img style="width:200px;" src="/upload_files/{{$profile->emirated_id_copy}}">
                         </div>
                     </div>
                 </div>

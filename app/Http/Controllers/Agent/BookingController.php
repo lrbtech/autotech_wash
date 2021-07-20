@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use App\customer;
+use App\colour;
+use App\vehicles;
 use App\booking;
 use App\booking_service;
 use App\booking_package;
@@ -34,7 +36,9 @@ class BookingController extends Controller
         $booking_product = booking_product::where('booking_id',$id)->get();
         $shop = User::find($booking->shop_id);
         $customer = customer::find($booking->customer_id);
-        return view('agent.booking_details',compact('booking_service','booking','booking_product','booking_package','customer','shop'));
+        $vehicle = vehicles::find($booking->vehicle_id);
+        $colour = colour::find($vehicle->colour);
+        return view('agent.booking_details',compact('booking_service','booking','booking_product','booking_package','customer','shop','vehicle','colour'));
     }
 
     public function getbooking($fdate,$tdate,$status){

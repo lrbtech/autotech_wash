@@ -17,7 +17,8 @@ class CreateBookingServicesTable extends Migration
             $table->id();
             $table->string('booking_id')->nullable();
             $table->string('service_id')->nullable();
-            $table->string('service_name')->nullable();
+            $table->string('service_name_english')->nullable();
+            $table->string('service_name_arabic')->nullable();
             $table->string('price')->default('0');
             $table->string('status')->default('0');
             $table->timestamps();

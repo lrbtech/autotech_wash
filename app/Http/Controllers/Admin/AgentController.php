@@ -59,7 +59,11 @@ class AgentController extends Controller
         
         return Datatables::of($agent)
             ->addColumn('name', function ($agent) {
-                    return '<td>'.$agent->name.'</td>';
+                return '<td>'.$agent->name.'</td>';
+            })
+
+            ->addColumn('shop_name', function ($agent) {
+                return '<td>'.$agent->busisness_name.'</td>';
             })
 
             ->addColumn('mobile', function ($agent) {
@@ -95,7 +99,8 @@ class AgentController extends Controller
                     <button class="dropdown-toggle button inline-block bg-theme-1 text-white"> Action </button>
                     <div class="dropdown-box mt-10 absolute w-48 top-0 left-0 z-20">
                         <div class="dropdown-box__content box p-2"> 
-                        <a href="/admin/view-agent/'.$agent->id.'" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> <i  data-feather="edit" class="w-4 h-4 mr-2"></i> View </a>
+                        <a target="_blank" href="/shop-login/'.$agent->user_id.'" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> <i  data-feather="edit" class="w-4 h-4 mr-2"></i> Shop Login </a>
+                        <a href="/admin/view-agent/'.$agent->id.'" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> <i  data-feather="edit" class="w-4 h-4 mr-2"></i> View Details </a>
                         '.$output.'
                         </div>
                     </div>
@@ -103,7 +108,7 @@ class AgentController extends Controller
             })
            
             
-        ->rawColumns(['name','mobile', 'email', 'status','action'])
+        ->rawColumns(['name','mobile', 'email', 'status','action','shop_name'])
         ->addIndexColumn()
         ->make(true);
 

@@ -43,7 +43,7 @@ Route::group(['prefix' => 'customer'],function(){
     Route::post('/update-vehicles', 'Api\UserController@updatevehicles');
     Route::get('/get-vehicles/{user_id}', 'Api\UserController@getvehicles');
     Route::get('/edit-vehicles/{id}', 'Api\UserController@editvehicles');
-    Route::get('/delete-vehicles/{id}/{status}', 'Api\UserController@deletevehicles');
+    Route::get('/delete-vehicles/{id}', 'Api\UserController@deletevehicles');
 
     // Route::get('/get-address/{user_id}', 'Api\UserController@getaddress');
     // Route::get('/show-address/{user_id}', 'Api\UserController@showaddress');
@@ -95,6 +95,8 @@ Route::group(['prefix' => 'customer'],function(){
     Route::get('/get-about/{lang}', 'Api\UserController@getabout');
 
     Route::get('/get-notification/{customer_id}', 'Api\UserController@getnotification');
+
+    Route::get('/get-share-url', 'Api\UserController@getshareurl');
 
 });
 

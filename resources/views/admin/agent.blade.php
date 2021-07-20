@@ -24,8 +24,9 @@
             <table id="datatable" class="table table-report -mt-2">
                 <thead>
                     <tr>
-                        <!-- <th class="whitespace-no-wrap">#</th> -->
-                        <th class="whitespace-no-wrap">Name</th>
+                        <th class="whitespace-no-wrap">#</th>
+                        <th class="whitespace-no-wrap">Shop Name</th>
+                        <th class="whitespace-no-wrap">Owner Name</th>
                         <th class="whitespace-no-wrap">Mobile</th>
                         <th class="whitespace-no-wrap">Email</th>
                         <th class="whitespace-no-wrap">Status</th>
@@ -59,7 +60,8 @@ var orderPageTable = $('#datatable').DataTable({
         "data":{ _token: "{{csrf_token()}}"}
     },
     "columns": [
-        // { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        { data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        { data: 'shop_name', name: 'shop_name'},
         { data: 'name', name: 'name'},
         { data: 'mobile', name: 'mobile' },
         { data: 'email', name: 'email' },
