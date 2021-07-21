@@ -244,7 +244,7 @@ class UserController extends Controller
         $exist = customer::where('mobile',$request->mobile)->get();
         if(count($exist)>0){
             if($request->mobile == '564180385'){
-                $randomid = '1234'; 
+                $randomid = 1234; 
             }
             else{
                 $randomid = mt_rand(1000,9999); 
@@ -465,6 +465,7 @@ class UserController extends Controller
                 'brand' => $value->brand,
                 'colour_name' => $colour->name,
                 'colour_code' => $colour->code,
+                'colour_id' =>(int)$value->colour,
                 'registration_city' => $value->registration_city,
                 'registration_code' => $value->registration_code,
                 'registration_number' => $value->registration_number,
@@ -477,7 +478,7 @@ class UserController extends Controller
     public function updatevehicles(Request $request){
         try{            
             $vehicles = vehicles::find($request->id);
-            $vehicles->user_id = $request->user_id;
+            //$vehicles->user_id = $request->user_id;
             $vehicles->vehicle_name = $request->vehicle_name;
             $vehicles->brand = $request->brand;
             //$vehicles->vehicle_type = $request->vehicle_type;
