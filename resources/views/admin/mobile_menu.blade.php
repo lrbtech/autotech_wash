@@ -73,6 +73,12 @@
             </a>
         </li>
         <li>
+            <a href="/admin/chat-customer" class="menu chat-customer">
+                <div class="menu__icon"> <i data-feather="message-circle"></i> </div>
+                <div class="menu__title"> Chat </div>
+            </a>
+        </li>
+        <li>
             <a href="javascript:;" class="menu settings_master">
                 <div class="menu__icon"> <i data-feather="settings"></i> </div>
                 <div class="menu__title"> Settings <i data-feather="chevron-down" class="menu__sub-icon"></i> </div>

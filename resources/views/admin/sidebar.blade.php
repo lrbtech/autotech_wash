@@ -65,6 +65,14 @@
                 <div class="side-menu__title"> Booking </div>
             </a>
         </li>
+
+        <li>
+            <a href="/admin/chat-customer" class="side-menu chat-customer">
+                <div class="side-menu__icon"> <i data-feather="message-circle"></i> </div>
+                <div class="side-menu__title"> Chat </div>
+            </a>
+        </li>
+
         <li>
             <a href="javascript:;" class="side-menu settings_master">
                 <div class="side-menu__icon"> <i data-feather="settings"></i> </div>

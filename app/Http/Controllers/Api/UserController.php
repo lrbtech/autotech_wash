@@ -28,12 +28,15 @@ use App\colour;
 use App\coupon;
 use App\push_notification;
 use App\reviews;
+use App\admin_customer;
 use Hash;
 use Auth;
 use DB;
 use Validator;
 use Mail;
 use Carbon\Carbon;
+use App\Events\ChatEvent;
+use App\Events\ChatAdmin;
 use StdClass;
 use Str;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
@@ -243,7 +246,7 @@ class UserController extends Controller
     public function customerLogin(Request $request){
         $exist = customer::where('mobile',$request->mobile)->get();
         if(count($exist)>0){
-            if($request->mobile == '564180385'){
+            if($request->mobile == '564180384'){
                 $randomid = 1234; 
             }
             else{
@@ -267,7 +270,12 @@ class UserController extends Controller
                 'status'=>1], 
             200);
         }else{
-            $randomid = mt_rand(1000,9999); 
+            if($request->mobile == '564180384'){
+                $randomid = 1234; 
+            }else{
+
+                $randomid = mt_rand(1000,9999); 
+            }
             $msg= "Dear Customer, Please use the code ".$randomid." to register your Auto Tech By Wash Account";
             $this->send_sms($request->mobile,$msg);
             return response()->json(
@@ -375,10 +383,10 @@ class UserController extends Controller
     public function getcity(){
         $data = city::where('status',0)->get();
         foreach ($data as $key => $value) {
-            $data = array(
-                'city' => $value->city,
-            );
-            $datas[] = $data;
+            // $data = array(
+            //     'city' => $value->city,
+            // );
+            $datas[] = $value->city;
         }   
         return response()->json($datas); 
     }
@@ -981,7 +989,7 @@ if(count($coupon)>0){
 
 
     public function getAccessToken(){
-        $apikey="MTg3YjNkMmMtYzE3Zi00M2NiLWE1MzUtMWE2ZWQ1MGM0ZjhkOjEzY2I0NGNhLWJmZGQtNDMzMS1iMGZhLWQ0MzI0NWE3ZWIzZA==";
+        $apikey="MmNjNTRhMjctOTlhNy00Y2U5LThhYWEtZTY3NDAyZTlmMDZmOjJhYzU0YTQ0LWZiMWUtNDM0ZS04ZGQzLTYxZTE1NDFjZTM1Mg==";
         
         // enter your API key here
         $ch = curl_init(); 
@@ -1016,7 +1024,7 @@ if(count($coupon)>0){
         $postData->amount->currencyCode = "AED"; 
         $postData->amount->value = $amount; 
         
-        $outlet = "c7afec2c-26da-4d75-bb50-3f2fa93ed87e";
+        $outlet = "b603c81e-dc26-40e7-8088-acd938b6440b";
         $token=$this->getAccessToken();
         
         $json = json_encode($postData);
@@ -1048,7 +1056,7 @@ if(count($coupon)>0){
     public function getRetrivePayment($id){
         $booking = booking::find($id);
         $orderID = $booking->order_id;
-        $outlet = "c7afec2c-26da-4d75-bb50-3f2fa93ed87e";
+        $outlet = "b603c81e-dc26-40e7-8088-acd938b6440b";
         $token=$this->getAccessToken();
     
         $curl = curl_init();
@@ -1233,7 +1241,7 @@ if(count($coupon)>0){
 
     public function getallbooking($id){
         $booking = booking::where('customer_id',$id)->orderBy('id','DESC')->get();
-        $data =array();
+        $datas =array();
         foreach ($booking as $key => $value) {
             if($value->payment_type == '1' && $value->payment_status == '0'){
             }
@@ -1653,6 +1661,68 @@ if(count($coupon)>0){
     {
         $data = array('https://apps.apple.com/ae/app/isalon-uae-app/id1537638428','https://play.google.com/store/apps/details?id=com.isalon.isalonapp');
         return response()->json($data);
+    }
+
+    public function savechatadmin(Request $request){
+        date_default_timezone_set("Asia/Dubai");
+        date_default_timezone_get();
+        $admin_customer = new admin_customer;
+        $admin_customer->message = $request->message;
+        $admin_customer->customer_id = $request->customer_id;
+        $admin_customer->date = date('Y-m-d');
+        $admin_customer->time = date('h:i A');
+        $admin_customer->message_from = 0;
+        if( $request->message != ''){
+        $admin_customer->save();
+            //$this->sendChatNotification($admin_customer->id);
+            $dateTime = new Carbon($admin_customer->updated_at, new \DateTimeZone('Asia/Dubai'));
+            $message =  array(
+            'message'=> $admin_customer->message,
+            'message_from'=> 0,
+            'date'=> $dateTime->diffForHumans(),
+            'channel_name'=> (string)$request->customer_id,
+            );
+            event(new ChatAdmin($message));
+        }
+        return response()->json(
+        ['message' => 'Save Successfully'],
+        200);
+    }
+
+    public function getchatadmin($id){
+        date_default_timezone_set("Asia/Dubai");
+        date_default_timezone_get();
+        $chat = admin_customer::where('customer_id',$id)->orderBy('id','DESC')->get();
+        $data =array();
+        $datas =array();
+        foreach ($chat as $key => $value) {
+            $dateTime = new Carbon($value->updated_at, new \DateTimeZone('Asia/Dubai'));
+            $data = array(
+                //'admin_id' => $value->admin_id,
+                'message' => $value->message,
+                'message_from' => (int)$value->message_from,
+                'time' => $dateTime->diffForHumans(),
+            );
+            $datas[] = $data;
+        }   
+        return response()->json($datas); 
+    }
+
+    public function adminchatcount($id){
+        date_default_timezone_set("Asia/Dubai");
+        date_default_timezone_get();
+        $chat = admin_customer::where('booking_id',$id)->orderBy('id','DESC')->get();
+        $chat_count=0;
+
+        foreach ($chat as $key => $value) {
+            if($value->message_from == 0){
+            break;
+            }
+            $chat_count++;
+        }   
+        return response()->json([
+            'chat_count'=>$chat_count
+        ], 200);
     }
 
 

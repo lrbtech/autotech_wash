@@ -45,7 +45,8 @@
                         <option value="1">Order Accepted</option>
                         <option value="2">Received</option>
                         <option value="3">Processing</option>
-                        <option value="4">Delivered</option>
+                        <option value="4">Completed</option>
+                        <option value="5">Delivered</option>
                         </select>
                     </div>
                     <div class="relative mt-2">

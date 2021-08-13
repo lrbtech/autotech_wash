@@ -185,6 +185,7 @@ class SettingsController extends Controller
             'email'=>'required|unique:users',
             'mobile'=>'required|unique:users|digits:9',
             'password'=>'required',
+            'role_id'=>'required',
             //'image' => 'required|mimes:jpeg,jpg,png|max:1000', // max 1000kb
           ],[
             // 'image.mimes' => 'Only jpeg, png and jpg images are allowed',
@@ -198,6 +199,7 @@ class SettingsController extends Controller
         $staff->name = $request->name;
         $staff->email = $request->email;
         $staff->mobile = $request->mobile;
+        $staff->role_id = $request->role_id;
         $staff->password = Hash::make($request->password);
         $staff->save();
 
@@ -209,6 +211,7 @@ class SettingsController extends Controller
             'name'=>'required',
             'email'=>'required|unique:users,email,'.$request->id,
             'mobile'=>'required|digits:9|unique:users,mobile,'.$request->id,
+            'role_id'=>'required',
             //'image' => 'required|mimes:jpeg,jpg,png|max:1000', // max 1000kb
           ],[
             // 'image.mimes' => 'Only jpeg, png and jpg images are allowed',
@@ -221,6 +224,7 @@ class SettingsController extends Controller
         $staff->name = $request->name;
         $staff->email = $request->email;
         $staff->mobile = $request->mobile;
+        $staff->role_id = $request->role_id;
         if($request->password != ''){
         $staff->password = Hash::make($request->password);
         }

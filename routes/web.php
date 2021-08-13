@@ -164,6 +164,11 @@ Route::group(['prefix' => 'admin'],function(){
 	Route::get('/get-notification-shop/{id}', 'Admin\NotificationController@getNotificationshop');
 	Route::get('/get-notification-customer/{id}', 'Admin\NotificationController@getNotificationCustomer');
 
+    Route::get('/chat-customer', 'Admin\ChatController@chatcustomer');
+	Route::get('/get-customer-chat/{id}', 'Admin\ChatController@getcustomerchat');
+    Route::get('/view-customer-chat/{id}', 'Admin\ChatController@viewcustomerchat');
+	Route::POST('/save-customer-chat', 'Admin\ChatController@savecustomerchat');
+
 });
 
 Route::group(['prefix' => 'agent'],function(){
@@ -205,6 +210,9 @@ Route::group(['prefix' => 'agent'],function(){
     Route::get('/booking', 'Agent\BookingController@booking');
     Route::POST('/get-booking/{date1}/{date2}/{status}', 'Agent\BookingController@getbooking');
     Route::get('/booking-details/{id}', 'Agent\BookingController@bookingdetails');
+
+    Route::get('/update-booking-payment/{id}', 'Agent\BookingController@updatebookingpayment');
+    Route::get('/update-booking-status/{booking_id}/{status}', 'Agent\BookingController@updatebookingstatus');
 
     Route::get('/store-time', 'Agent\ReviewController@storetime');
 	Route::POSt('/update-store-time', 'Agent\ReviewController@updatestoretime');

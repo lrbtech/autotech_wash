@@ -32,6 +32,7 @@
                     <th class="border-b-2 whitespace-no-wrap">Name</th>
                     <th class="border-b-2 whitespace-no-wrap">Email</th>
                     <th class="border-b-2 whitespace-no-wrap">Mobile</th>
+                    <th class="border-b-2 whitespace-no-wrap">Role</th>
                     <th class="border-b-2 text-center whitespace-no-wrap">Status</th>
                     <th class="border-b-2 text-center whitespace-no-wrap">Action</th>
                 </tr>
@@ -43,6 +44,15 @@
                     <td>{{$row->name}}</td>
                     <td>{{$row->email}}</td>
                     <td>{{$row->mobile}}</td>
+                    <td class="w-40">
+                        @if($row->role_id == 2)
+                        <div class="flex items-center justify-center text-theme-3"> <i data-feather="check-square" class="w-4 h-4 mr-2"></i> Agent </div>
+                        @elseif($row->role_id == 3)
+                        <div class="flex items-center justify-center text-theme-3"> <i data-feather="check-square" class="w-4 h-4 mr-2"></i> Technician </div>
+                        @elseif($row->role_id == 4)
+                        <div class="flex items-center justify-center text-theme-3"> <i data-feather="check-square" class="w-4 h-4 mr-2"></i> Agent & Technician </div>
+                        @endif
+                    </td>
                     <td class="w-40">
                         @if($row->status == 0)
                         <div class="flex items-center justify-center text-theme-3"> <i data-feather="check-square" class="w-4 h-4 mr-2"></i> Active </div>
@@ -74,7 +84,7 @@
     <div class="modal__content">
         <div class="flex items-center px-5 py-5 sm:py-3 border-b border-gray-200">
             <h2 id="modal-title" class="font-medium text-base mr-auto">
-                Add product
+                Add Staff
             </h2>
             <!-- <button class="button border items-center text-gray-700 hidden sm:flex"> <i data-feather="file" class="w-4 h-4 mr-2"></i> Download Docs </button>
             <div class="dropdown relative sm:hidden">
@@ -101,6 +111,15 @@
             <div class="col-span-12 sm:col-span-12">
                 <label>Mobile</label>
                 <input autocomplete="off" type="number" class="input w-full border mt-2 flex-1" name="mobile" id="mobile">
+            </div>
+            <div class="col-span-12 sm:col-span-12">
+                <label>Role</label>
+                <select class="input w-full border mt-2 flex-1" name="role_id" id="role_id">
+                    <option value="">SELECT</option>
+                    <option value="2">Agent</option>
+                    <option value="3">Technician</option>
+                    <option value="4">Agent & Technician</option>
+                </select>
             </div>
             <div class="col-span-12 sm:col-span-12">
                 <label>Password</label>
@@ -210,6 +229,7 @@ function Edit(id){
       $('input[name=mobile]').val(data.mobile);
       $('input[name=email]').val(data.email);
       $('input[name=id]').val(id);
+      $('select[name=role_id]').val(role_id);
       action_type = 2;
       $(".label-error").remove();
       $('.input').removeClass('error');

@@ -98,6 +98,11 @@ Route::group(['prefix' => 'customer'],function(){
 
     Route::get('/get-share-url', 'Api\UserController@getshareurl');
 
+    //chat admin
+    Route::get('/get-chat-admin/{id}', 'Api\UserController@getchatadmin');
+    Route::post('/save-chat-admin', 'Api\UserController@savechatadmin');
+    Route::get('/admin-chat-count/{id}', 'Api\UserController@adminchatcount');
+
 });
 
 
@@ -105,23 +110,36 @@ Route::group(['prefix' => 'agent'],function(){
 
     Route::post('/login', 'Api\AgentController@agentLogin');
 
+    Route::get('/dashboard/{id}', 'Api\AgentController@dashboard');
+
     Route::get('/get-list-service', 'Api\AgentController@getlistservice');
 
     Route::get('/get-service/{shop_id}', 'Api\AgentController@getservice');
     Route::post('/save-service', 'Api\AgentController@saveservice');
+    Route::post('/update-service', 'Api\AgentController@updateservice');
+    Route::get('/delete-service/{id}', 'Api\AgentController@deleteservice');
 
     Route::get('/get-package/{shop_id}', 'Api\AgentController@getpackage');
     Route::get('/get-package-services/{id}', 'Api\AgentController@getpackageservices');
     Route::post('/save-package', 'Api\AgentController@savepackage');
+    Route::post('/update-package', 'Api\AgentController@updatepackage');
+    Route::get('/delete-package/{id}', 'Api\AgentController@deletepackage');
 
     Route::get('/get-product/{shop_id}', 'Api\AgentController@getproduct');
     Route::post('/save-product', 'Api\AgentController@saveproduct');
+    Route::post('/update-product', 'Api\AgentController@updateproduct');
+    Route::get('/delete-product/{id}', 'Api\AgentController@deleteproduct');
 
+    Route::get('/get-today-booking/{shop_id}', 'Api\AgentController@gettodaybooking');
+    Route::get('/get-booking-completed/{shop_id}', 'Api\AgentController@getbookingcompleted');
     Route::get('/get-booking/{shop_id}', 'Api\AgentController@getbooking');
     Route::get('/get-booking-details/{id}', 'Api\AgentController@getbookingdetails');
     Route::get('/get-booking-service/{id}', 'Api\AgentController@getbookingservice');
     Route::get('/get-booking-product/{id}', 'Api\AgentController@getbookingproduct');
     Route::get('/get-booking-package/{id}', 'Api\AgentController@getbookingpackage');
+
+    Route::get('/update-booking-status/{booking_id}/{status}', 'Api\AgentController@updatebookingstatus');
+    Route::get('/update-booking-paid/{booking_id}', 'Api\AgentController@updatebookingpaid');
 
     Route::get('/get-notification/{id}', 'Api\AgentController@getnotification');
 

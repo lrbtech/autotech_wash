@@ -41,6 +41,20 @@ class BookingController extends Controller
         return view('agent.booking_details',compact('booking_service','booking','booking_product','booking_package','customer','shop','vehicle','colour'));
     }
 
+    public function updatebookingpayment($id){
+        $booking = booking::find($id);
+        $booking->payment_status = 1;
+        $booking->save();
+        return response()->json('Successfully Update');
+    }
+
+    public function updatebookingstatus($id,$status){
+        $booking = booking::find($id);
+        $booking->status = $status;
+        $booking->save();
+        return response()->json('Successfully Update');
+    }
+
     public function getbooking($fdate,$tdate,$status){
         $fdate1 = date('Y-m-d', strtotime($fdate));
         $tdate1 = date('Y-m-d', strtotime($tdate));
@@ -55,6 +69,15 @@ class BookingController extends Controller
             $i->where('b.status', $status);
         }
         $i->where('b.shop_id', Auth::user()->user_id);
+        $i->where(function($query) use ($tdate1,$fdate1){
+            $query->where([
+                ['b.payment_type', 1],
+                ['b.payment_status', 1],
+            ]);
+            $query->orWhere([
+                ['b.payment_type', 0],
+            ]);
+        });
         $i->orderBy('b.id','DESC');
         $booking = $i->get();
         
@@ -81,6 +104,14 @@ class BookingController extends Controller
                     return '<td>Card Payment</td>';
                 }
             })
+            ->addColumn('payment_status', function ($booking) {
+                if ($booking->payment_status == 0) {
+                    return '<td>Un Paid</td>';
+                } 
+                elseif ($booking->payment_status == 1) {
+                    return '<td>Paid</td>';
+                }
+            })
             ->addColumn('status', function ($booking) {
                 if ($booking->status == 0) {
                     return '<td>Order Placed</td>';
@@ -105,17 +136,50 @@ class BookingController extends Controller
             })
 
             ->addColumn('action', function ($booking) {
+                $output='';
+                if($booking->payment_status == 0){
+                    $output.='
+                    <a onclick="UpdatePayment('.$booking->id.')" href="#" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> Paid</a>
+                    ';
+                }
+
+                if($booking->status == 0){
+                    $output.='
+                    <a onclick="UpdateStatus('.$booking->id.',1)" href="#" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> Order Placed</a>
+                    ';
+                }
+                elseif($booking->status == 1){
+                    $output.='
+                    <a onclick="UpdateStatus('.$booking->id.',2)" href="#" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> Pickup</a>
+                    ';
+                }
+                elseif($booking->status == 2){
+                    $output.='
+                    <a onclick="UpdateStatus('.$booking->id.',3)" href="#" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> On Processing</a>
+                    ';
+                }
+                elseif($booking->status == 3){
+                    $output.='
+                    <a onclick="UpdateStatus('.$booking->id.',4)" href="#" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> Completed</a>
+                    ';
+                }
+                elseif($booking->status == 4){
+                    $output.='
+                    <a onclick="UpdateStatus('.$booking->id.',5)" href="#" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> Delivered</a>
+                    ';
+                }
                 return '<div class="dropdown relative"> 
                     <button class="dropdown-toggle button inline-block bg-theme-1 text-white"> Action </button>
                     <div class="dropdown-box mt-10 absolute w-48 top-0 left-0 z-20">
                         <div class="dropdown-box__content box p-2"> 
                         <a href="/agent/booking-details/'.$booking->id.'" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white hover:bg-gray-200 rounded-md"> View Details</a>
+                        '.$output.'
                         </div>
                     </div>
                 </div>';
             })
             
-        ->rawColumns(['customer_details', 'booking_id', 'payment_type','booking_date','total','status','action'])
+        ->rawColumns(['customer_details', 'booking_id', 'payment_type','booking_date','total','status','action','payment_status'])
         ->addIndexColumn()
         ->make(true);
 

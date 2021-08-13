@@ -28,7 +28,8 @@
                         <option value="1">Order Accepted</option>
                         <option value="2">Received</option>
                         <option value="3">Processing</option>
-                        <option value="4">Delivered</option>
+                        <option value="4">Completed</option>
+                        <option value="5">Delivered</option>
                         </select>
                     </div>
                     <div class="relative mt-2">
@@ -47,6 +48,7 @@
                         <th class="whitespace-no-wrap">Customer Details</th>
                         <th class="whitespace-no-wrap">Payment Type</th>
                         <th class="whitespace-no-wrap">Total</th>
+                        <th class="whitespace-no-wrap">Payment Status</th>
                         <th class="whitespace-no-wrap">Status</th>
                         <th class="whitespace-no-wrap">Action</th>
                     </tr>
@@ -103,6 +105,7 @@ var orderPageTable = $('#datatable').DataTable({
         { data: 'customer_details', name: 'customer_details' },
         { data: 'payment_type', name: 'payment_type' },
         { data: 'total', name: 'total' },
+        { data: 'payment_status', name: 'payment_status' },
         { data: 'status', name: 'status' },
         { data: 'action', name: 'action' },
     ]
@@ -113,6 +116,54 @@ $('#search').click(function(){
     orderPageTable.ajax.url(new_url).load(null, false);
     //orderPageTable.draw();
 });
+
+function UpdatePayment(id){
+    var r = confirm("Are you sure");
+    if (r == true) {
+      $.ajax({
+        url : '/agent/update-booking-payment/'+id,
+        type: "GET",
+        dataType: "JSON",
+        success: function(data)
+        {
+            Swal.fire({
+                //title: "Please Check Your Email",
+                text: 'Successfully Update',
+                type: "success",
+                confirmButtonClass: 'button text-white bg-theme-1 shadow-md mr-2',
+                buttonsStyling: false,
+            }).then(function() {
+                var new_url = search_url();
+                orderPageTable.ajax.url(new_url).load(null, false);
+            });
+        }
+      });
+    } 
+}
+
+function UpdateStatus(id,status){
+    var r = confirm("Are you sure");
+    if (r == true) {
+      $.ajax({
+        url : '/agent/update-booking-status/'+id+'/'+status,
+        type: "GET",
+        dataType: "JSON",
+        success: function(data)
+        {
+            Swal.fire({
+                //title: "Please Check Your Email",
+                text: 'Successfully Update',
+                type: "success",
+                confirmButtonClass: 'button text-white bg-theme-1 shadow-md mr-2',
+                buttonsStyling: false,
+            }).then(function() {
+                var new_url = search_url();
+                orderPageTable.ajax.url(new_url).load(null, false);
+            });
+        }
+      });
+    } 
+}
 
 </script>
 @endsection

@@ -62,34 +62,44 @@ class AgentController extends Controller
     }
 
     public function agentLogin(Request $request){
-        $exist = User::where('mobile',$request->mobile)->get();
+        $exist = User::where('email',$request->email)->get();
         if(count($exist)>0){
             if($exist[0]->status == 0){
                 if(Hash::check($request->password,$exist[0]->password)){
-                    // $agent = User::find($exist[0]->id);
-                    // $agent->firebase_key = $request->firebase_key;
-                    // $agent->save();
+                    $agent = User::find($exist[0]->id);
+                    $agent->firebase_key = $request->firebase_key;
+                    $agent->save();
                 
                 $agent_type='';
-                if($exist[0]->id == $exist[0]->user_id){
-                    $agent_type='admin';
+                if($exist[0]->role_id == 'admin'){
+                    $agent_type=1;
                 }
-                else{
-                    $agent_type='staff';
-                }        
+                elseif($exist[0]->role_id == '2'){
+                    $agent_type=2;
+                }
+                elseif($exist[0]->role_id == '3'){
+                    $agent_type=3;
+                }
+                elseif($exist[0]->role_id == '4'){
+                    $agent_type=4;
+                }
+
                 return response()->json(['message' => 'Login Successfully',
                 '_id'=>$exist[0]->id,
-                'shop_id'=>$exist[0]->user_id,
-                'agent_type'=>$agent_type,
+                'shop_id'=>(int)$exist[0]->user_id,
+                'name'=>$exist[0]->name,
+                'shop_name'=>$exist[0]->busisness_name,
+                'cover_image'=>$exist[0]->cover_image,
+                'agent_type'=>(int)$agent_type,
                 ], 200);
                 }else{
                     return response()->json(['message' => 'Records Does not Match','status'=>403], 403);
                 }
             }else{
-                return response()->json(['message' => 'Verify Your Account','status'=>401,'customer_id'=>$exist[0]->id], 401);
+                return response()->json(['message' => 'Verify Your Account','status'=>401,'agent_id'=>$exist[0]->id], 401);
             }
         }else{
-            return response()->json(['message' => 'Mobile Number Not Registered','status'=>404], 404);
+            return response()->json(['message' => 'Email Address Not Registered','status'=>404], 404);
         }
     }
 
@@ -109,7 +119,7 @@ class AgentController extends Controller
             }
             $datas[] = $data;
         }   
-        return response()->json(['message'=>'get-list-service','data'=>$datas]);
+        return response()->json($datas);
     }
 
     public function getservice($id){
@@ -130,7 +140,7 @@ class AgentController extends Controller
             }
             $datas[] = $data;
         }   
-        return response()->json(['message'=>'get-service','data'=>$datas]);
+        return response()->json($datas);
     }
 
     public function saveservice(Request $request){
@@ -156,6 +166,36 @@ class AgentController extends Controller
         } 
     }
 
+    public function updateservice(Request $request){
+        try{
+            $service = service::where('service_name_english',$request->service_id)->first();
+            $shop_service = shop_service::where('service_id',$service->id)->where('shop_id',$request->shop_id)->get();
+            if(count($shop_service)>0){
+                return response()->json(['message' => 'This Service Has been Already Registered','status'=>403], 403);
+            }
+            
+            $service = shop_service::find($request->id);
+            $service->shop_id = $request->shop_id;
+            $service->service_id = $service->id;
+            $service->price = $request->price;
+            $service->save();
+
+            return response()->json(
+            ['message' => 'Save Successfully',
+            'service_id'=>$service->id,
+            ], 200);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(),'status'=>400], 400);
+        } 
+    }
+
+    public function deleteservice($id){
+        $shop_service = shop_service::find($id);
+        $shop_service->status = 1;
+        $shop_service->save();
+        return response()->json(['message' => 'Delete Successfully'], 200);
+    }
+
     public function getproduct($id){
         $product = shop_product::where('shop_id',$id)->where('status',0)->get();
         $data =array();
@@ -176,7 +216,7 @@ class AgentController extends Controller
             }
             $datas[] = $data;
         }   
-        return response()->json(['message'=>'get-product','data'=>$datas]);
+        return response()->json($datas);
     }
 
     public function saveproduct(Request $request){
@@ -216,6 +256,50 @@ class AgentController extends Controller
         } 
     }
 
+    public function updateproduct(Request $request){
+        try{            
+            $shop_product = shop_product::where('product_name_english',$request->product_name_english)->where('shop_id',$request->shop_id)->get();
+            if(count($shop_product)>0){
+                return response()->json(['message' => 'This Product Has been Already Registered','status'=>403], 403);
+            }
+
+            $product = shop_product::find($request->id);
+            $product->shop_id = $request->shop_id;
+            $product->price = $request->price;
+            $product->product_name_english = $request->product_name_english;
+            $product->product_name_arabic = $request->product_name_arabic;
+            if(isset($request->image)){
+                if($request->file('image')!=""){
+                    $image = $request->image;
+                    $image_name = $request->image_name;
+                    $filename1='';
+                    foreach(explode('.', $image_name) as $info){
+                        $filename1 = $info;
+                    }
+                    $fileName = rand() . '.' . $filename1;
+                    $realImage = base64_decode($image);
+                    file_put_contents(public_path().'/upload_service/'.$fileName, $realImage);    
+                    $product->image =  $fileName;
+                }
+            }
+            $product->save();
+
+            return response()->json(
+            ['message' => 'Save Successfully',
+            'product_id'=>$product->id,
+            ], 200);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(),'status'=>400], 400);
+        } 
+    }
+
+    public function deleteproduct($id){
+        $shop_product = shop_product::find($id);
+        $shop_product->status = 1;
+        $shop_product->save();
+        return response()->json(['message' => 'Delete Successfully'], 200);
+    }
+
     public function getpackage($id){
         $package = shop_package::where('shop_id',$id)->where('status',0)->get();
         $data =array();
@@ -236,7 +320,7 @@ class AgentController extends Controller
             }
             $datas[] = $data;
         }   
-        return response()->json(['message'=>'get-package','data'=>$datas]);
+        return response()->json($datas);
     }
 
     public function getpackageservices($id){
@@ -255,7 +339,7 @@ class AgentController extends Controller
             }
             $datas[] = $data;
         }   
-        return response()->json(['message'=>'get-package-services','data'=>$datas]);
+        return response()->json($datas);
     }
 
     public function savepackage(Request $request){
@@ -266,6 +350,44 @@ class AgentController extends Controller
             }
 
             $package = new shop_package;
+            $package->shop_id = $request->shop_id;
+            //$package->service_ids = $request->service_ids;
+            $package->price = $request->price;
+            $package->package_name_english = $request->package_name_english;
+            $package->package_name_arabic = $request->package_name_arabic;
+            if(isset($request->image)){
+                if($request->file('image')!=""){
+                    $image = $request->image;
+                    $image_name = $request->image_name;
+                    $filename1='';
+                    foreach(explode('.', $image_name) as $info){
+                        $filename1 = $info;
+                    }
+                    $fileName = rand() . '.' . $filename1;
+                    $realImage = base64_decode($image);
+                    file_put_contents(public_path().'/upload_service/'.$fileName, $realImage);    
+                    $package->image =  $fileName;
+                }
+            }
+            $package->save();
+
+            return response()->json(
+            ['message' => 'Save Successfully',
+            'package_id'=>$package->id,
+            ], 200);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(),'status'=>400], 400);
+        } 
+    }
+
+    public function updatepackage(Request $request){
+        try{            
+            $shop_package = shop_package::where('package_name_english',$request->package_name_english)->where('shop_id',$request->shop_id)->get();
+            if(count($shop_package)>0){
+                return response()->json(['message' => 'This Package Name Has been Already Registered','status'=>403], 403);
+            }
+
+            $package = shop_package::find($request->id);
             $package->shop_id = $request->shop_id;
             $package->service_ids = $request->service_ids;
             $package->price = $request->price;
@@ -296,55 +418,47 @@ class AgentController extends Controller
         } 
     }
 
-
-    public function getbooking($id){
-        $booking = booking::where('shop_id',$id)->orderBy('id','DESC')->get();
-        $data =array();
-        $datas =array();
-        foreach ($booking as $key => $value) {
-            $shop = User::find($value->shop_id);
-            $customer = customer::find($value->customer_id);
-            $vehicle = vehicles::find($value->vehicle_id);
-            $shop = User::find($value->shop_id);
-            $data = array(
-                'booking_id' => $value->id,
-                'name' => $customer->first_name .' '. $customer->last_name,
-                'image' => '',
-                'booking_type' => '',
-                'booking_for' => $value->booking_for,
-                'booking_date' => $value->booking_date,
-                'booking_time' => $value->booking_time,
-                'vehicle'=> $vehicle->vehicle_name,
-            );
-            if($shop->other_service == 0){
-                $data['booking_type'] = 'Home Services';
-            }
-            else{
-                $data['booking_type'] = 'Visitus';
-            }
-            if($customer->image !=null){
-                $data['image'] = 'profile_image/'.$customer->image;
-            }
-            $datas[] = $data;
-        }   
-        return response()->json(['message'=>'get-booking','data'=>$datas]); 
+    public function deletepackage($id){
+        $shop_package = shop_package::find($id);
+        $shop_package->status = 1;
+        $shop_package->save();
+        return response()->json(['message' => 'Delete Successfully'], 200);
     }
 
-    public function getbookingdetails($id){
-        $booking = booking::where('id',$id)->get();
+    public function updatebookingstatus($booking_id,$status){
+        $booking = booking::find($booking_id);
+        $booking->status = $status;
+        $booking->save();
+        return response()->json(['message' => 'Update Successfully'], 200);
+    }
+
+    public function updatebookingpaid($booking_id){
+        $booking = booking::find($booking_id);
+        $booking->payment_status = 1;
+        $booking->save();
+        return response()->json(['message' => 'Update Successfully'], 200);
+    }
+
+    public function gettodaybooking($id){
+        $today = date('Y-m-d');
+        $booking = booking::where('date',$today)->where('shop_id',$id)->orderBy('id','DESC')->get();
         $data =array();
         $datas =array();
         foreach ($booking as $key => $value) {
+            if($value->payment_type == '1' && $value->payment_status == '0'){
+            }
+            else{
             $shop = User::find($value->shop_id);
             $customer = customer::find($value->customer_id);
             $vehicle = vehicles::find($value->vehicle_id);
             $data = array(
-                'booking_id' => $value->id,
+                'id' => $value->id,
+                'booking_id' => (string)$value->booking_id,
                 'customer_name' => $customer->first_name .' '. $customer->last_name,
                 'customer_mobile' => $customer->mobile,
                 'booking_date' => $value->booking_date,
                 'booking_time' => $value->booking_time,
-                'booking_status' => (int)$value->booking_status,
+                'status' => '',
                 'payment_type' => (int)$value->payment_type,
                 'payment_status' => (int)$value->payment_status,
                 'otp' => $value->otp,
@@ -352,15 +466,16 @@ class AgentController extends Controller
                 'total' => $value->total,
                 'coupon_code' => '',
                 'coupon_value' => 0.0,
-                'vehicle_name'=> $vehicle->vehicle_name,
-                'vehicle_no'=> $vehicle->registration_city .' '. $vehicle->registration_code .' '. $vehicle->registration_number,
                 'booking_type' => '',
-                'latitude' => $value->latitude,
-                'longitude' => $value->longitude,
-                'address' => $value->address,
+                'latitude' => '',
+                'longitude' => '',
+                'address' => '',
             );
             if($shop->other_service == 0){
                 $data['booking_type'] = 'Home Services';
+                $data['latitude'] = $value->latitude;
+                $data['longitude'] = $value->longitude;
+                $data['address'] = $value->address;
             }
             else{
                 $data['booking_type'] = 'Visitus';
@@ -374,9 +489,249 @@ class AgentController extends Controller
             if($value->coupon_value !=null){
                 $data['coupon_value'] = $value->coupon_value;
             }
+            if($value->status == 0){
+                $data['status'] = 'Order Placed';
+            }
+            elseif($value->status == 1){
+                $data['status'] = 'Order Accepted';
+            }
+            elseif($value->status == 2){
+                $data['status'] = 'Received';
+            }
+            elseif($value->status == 3){
+                $data['status'] = 'Processing';
+            }
+            elseif($value->status == 4){
+                $data['status'] = 'Completed';
+            }
+            elseif($value->status == 5){
+                $data['status'] = 'Delivered';
+            }
+            $datas[] = $data;
+            }
+        }   
+        return response()->json($datas);
+    }
+
+    public function getbooking($id){
+        $today = date('Y-m-d');
+        $booking = booking::where('date','!=',$today)->where('shop_id',$id)->orderBy('id','DESC')->get();
+        $data =array();
+        $datas =array();
+        foreach ($booking as $key => $value) {
+            if($value->payment_type == '1' && $value->payment_status == '0'){
+            }
+            else{
+            $shop = User::find($value->shop_id);
+            $customer = customer::find($value->customer_id);
+            $vehicle = vehicles::find($value->vehicle_id);
+            $data = array(
+                'id' => $value->id,
+                'booking_id' => (string)$value->booking_id,
+                'customer_name' => $customer->first_name .' '. $customer->last_name,
+                'customer_mobile' => $customer->mobile,
+                'booking_date' => $value->booking_date,
+                'booking_time' => $value->booking_time,
+                'status' => '',
+                'payment_type' => (int)$value->payment_type,
+                'payment_status' => (int)$value->payment_status,
+                'otp' => $value->otp,
+                'subtotal' => $value->subtotal,
+                'total' => $value->total,
+                'coupon_code' => '',
+                'coupon_value' => 0.0,
+                'booking_type' => '',
+                'latitude' => '',
+                'longitude' => '',
+                'address' => '',
+            );
+            if($shop->other_service == 0){
+                $data['booking_type'] = 'Home Services';
+                $data['latitude'] = $value->latitude;
+                $data['longitude'] = $value->longitude;
+                $data['address'] = $value->address;
+            }
+            else{
+                $data['booking_type'] = 'Visitus';
+            }
+            if(empty($shop->busisness_name)){
+                $data['shop_name'] = $shop->name;
+            }
+            if($value->coupon_code !=null){
+                $data['coupon_code'] = $value->coupon_code;
+            }
+            if($value->coupon_value !=null){
+                $data['coupon_value'] = $value->coupon_value;
+            }
+            if($value->status == 0){
+                $data['status'] = 'Order Placed';
+            }
+            elseif($value->status == 1){
+                $data['status'] = 'Order Accepted';
+            }
+            elseif($value->status == 2){
+                $data['status'] = 'Received';
+            }
+            elseif($value->status == 3){
+                $data['status'] = 'Processing';
+            }
+            elseif($value->status == 4){
+                $data['status'] = 'Completed';
+            }
+            elseif($value->status == 5){
+                $data['status'] = 'Delivered';
+            }
+            $datas[] = $data;
+            }
+        }   
+        return response()->json($datas);
+    }
+
+
+    public function getbookingcompleted($id){
+        $today = date('Y-m-d');
+        $booking = booking::where('status',4)->where('shop_id',$id)->orderBy('id','DESC')->get();
+        $data =array();
+        $datas =array();
+        foreach ($booking as $key => $value) {
+            if($value->payment_type == '1' && $value->payment_status == '0'){
+            }
+            else{
+            $shop = User::find($value->shop_id);
+            $customer = customer::find($value->customer_id);
+            $vehicle = vehicles::find($value->vehicle_id);
+            $data = array(
+                'id' => $value->id,
+                'booking_id' => (string)$value->booking_id,
+                'customer_name' => $customer->first_name .' '. $customer->last_name,
+                'customer_mobile' => $customer->mobile,
+                'booking_date' => $value->booking_date,
+                'booking_time' => $value->booking_time,
+                'status' => '',
+                'payment_type' => (int)$value->payment_type,
+                'payment_status' => (int)$value->payment_status,
+                'otp' => $value->otp,
+                'subtotal' => $value->subtotal,
+                'total' => $value->total,
+                'coupon_code' => '',
+                'coupon_value' => 0.0,
+                'booking_type' => '',
+                'latitude' => '',
+                'longitude' => '',
+                'address' => '',
+            );
+            if($shop->other_service == 0){
+                $data['booking_type'] = 'Home Services';
+                $data['latitude'] = $value->latitude;
+                $data['longitude'] = $value->longitude;
+                $data['address'] = $value->address;
+            }
+            else{
+                $data['booking_type'] = 'Visitus';
+            }
+            if(empty($shop->busisness_name)){
+                $data['shop_name'] = $shop->name;
+            }
+            if($value->coupon_code !=null){
+                $data['coupon_code'] = $value->coupon_code;
+            }
+            if($value->coupon_value !=null){
+                $data['coupon_value'] = $value->coupon_value;
+            }
+            if($value->status == 0){
+                $data['status'] = 'Order Placed';
+            }
+            elseif($value->status == 1){
+                $data['status'] = 'Order Accepted';
+            }
+            elseif($value->status == 2){
+                $data['status'] = 'Received';
+            }
+            elseif($value->status == 3){
+                $data['status'] = 'Processing';
+            }
+            elseif($value->status == 4){
+                $data['status'] = 'Completed';
+            }
+            elseif($value->status == 5){
+                $data['status'] = 'Delivered';
+            }
+            $datas[] = $data;
+            }
+        }   
+        return response()->json($datas);
+    }
+
+    public function getbookingdetails($id){
+        $booking = booking::where('id',$id)->get();
+        $data =array();
+        $datas =array();
+        foreach ($booking as $key => $value) {
+            $shop = User::find($value->shop_id);
+            $customer = customer::find($value->customer_id);
+            $vehicle = vehicles::find($value->vehicle_id);
+            $data = array(
+                'id' => $value->id,
+                'bookingid' => (string)$value->booking_id,
+                'customer_name' => $customer->first_name .' '. $customer->last_name,
+                'customer_mobile' => $customer->mobile,
+                'booking_date' => $value->booking_date,
+                'booking_time' => $value->booking_time,
+                'status' => '',
+                'payment_type' => (int)$value->payment_type,
+                'payment_status' => (int)$value->payment_status,
+                'otp' => $value->otp,
+                'subtotal' => $value->subtotal,
+                'total' => $value->total,
+                'coupon_code' => '',
+                'coupon_value' => 0.0,
+                'vehicle_name'=> $vehicle->vehicle_name,
+                'vehicle_no'=> $vehicle->registration_city .' '. $vehicle->registration_code .' '. $vehicle->registration_number,
+                'booking_type' => '',
+                'latitude' => '',
+                'longitude' => '',
+                'address' => '',
+            );
+            if($shop->other_service == 0){
+                $data['booking_type'] = 'Home Services';
+                $data['latitude'] = $value->latitude;
+                $data['longitude'] = $value->longitude;
+                $data['address'] = $value->address;
+            }
+            else{
+                $data['booking_type'] = 'Visitus';
+            }
+            if(empty($shop->busisness_name)){
+                $data['shop_name'] = $shop->name;
+            }
+            if($value->coupon_code !=null){
+                $data['coupon_code'] = $value->coupon_code;
+            }
+            if($value->coupon_value !=null){
+                $data['coupon_value'] = $value->coupon_value;
+            }
+
+            if($value->status == 0){
+                $data['status'] = 'Order Placed';
+            }
+            elseif($value->status == 1){
+                $data['status'] = 'Order Accepted';
+            }
+            elseif($value->status == 2){
+                $data['status'] = 'Received';
+            }
+            elseif($value->status == 3){
+                $data['status'] = 'Processing';
+            }
+            elseif($value->status == 4){
+                $data['status'] = 'Completed';
+            }
+            elseif($value->status == 5){
+                $data['status'] = 'Delivered';
+            }
             $datas[] = $data;
         }   
-        return response()->json(['message'=>'get-booking-details','data'=>$datas]); 
+        return response()->json($datas);
     }
 
     public function getbookingservice($id){
@@ -400,7 +755,7 @@ class AgentController extends Controller
         }else{
             $datas=array();
         }
-        return response()->json(['message'=>'get-booking-service','data'=>$datas]); 
+        return response()->json($datas);
     }
 
     public function getbookingpackage($id){
@@ -423,7 +778,7 @@ class AgentController extends Controller
         }else{
             $datas=array();
         }
-        return response()->json(['message'=>'get-booking-package','data'=>$datas]);  
+        return response()->json($datas);
     }
 
     public function getbookingproduct($id){
@@ -446,7 +801,30 @@ class AgentController extends Controller
         }else{
             $datas=array();
         }
-        return response()->json(['message'=>'get-booking-product','data'=>$datas]);  
+        return response()->json($datas);  
+    }
+
+    public function dashboard($id){
+        $today = date('Y-m-d');
+        $total_service = shop_service::where('shop_id',$id)->count();
+        $total_product = shop_product::where('shop_id',$id)->count();
+        $total_package = shop_package::where('shop_id',$id)->count();
+        $total_booking = booking::where('shop_id',$id)->count();
+        $today_booking = booking::where('shop_id',$id)->where('date',$today)->count();
+        $future_booking = booking::where('shop_id',$id)->where('date','>',$today)->count();
+        $open_booking = booking::where('shop_id',$id)->where('status',1)->count();
+
+        $data =array();
+        $data = array(
+            'total_service' => $total_service,
+            'total_product' => $total_product,
+            'total_package' => $total_package,
+            'total_booking' => $total_booking,
+            'today_booking' => $today_booking,
+            'future_booking' => $future_booking,
+            'open_booking' => $open_booking,
+        );
+        return response()->json($data);  
     }
 
 

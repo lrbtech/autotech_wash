@@ -1,5 +1,5 @@
 <!-- BEGIN: Search -->
-<div class="intro-x relative mr-3 sm:mr-6">
+<!-- <div class="intro-x relative mr-3 sm:mr-6">
     <div class="search hidden sm:block">
         <input type="text" class="search__input input placeholder-theme-13" placeholder="Search...">
         <i data-feather="search" class="search__icon"></i> 
@@ -84,13 +84,13 @@
             </a>
         </div>
     </div>
-</div>
+</div> -->
 <!-- END: Search -->
 <!-- BEGIN: Notifications -->
 <div class="intro-x dropdown relative mr-auto sm:mr-6">
     <div class="dropdown-toggle notification notification--bullet cursor-pointer"> <i data-feather="bell" class="notification__icon"></i> </div>
     <div class="notification-content dropdown-box mt-8 absolute top-0 left-0 sm:left-auto sm:right-0 z-20 -ml-10 sm:ml-0">
-        <div class="notification-content__box dropdown-box__content box">
+        <!-- <div class="notification-content__box dropdown-box__content box">
             <div class="notification-content__title">Notifications</div>
             <div class="cursor-pointer relative flex items-center ">
                 <div class="w-12 h-12 flex-none image-fit mr-1">
@@ -157,7 +157,7 @@
                     <div class="w-full truncate text-gray-600">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#039;s standard dummy text ever since the 1500</div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 <!-- END: Notifications -->

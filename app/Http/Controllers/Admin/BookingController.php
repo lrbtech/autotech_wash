@@ -60,6 +60,15 @@ class BookingController extends Controller
         {
             $i->where('b.status', $status);
         }
+        $i->where(function($query) use ($tdate1,$fdate1){
+            $query->where([
+                ['b.payment_type', 1],
+                ['b.payment_status', 1],
+            ]);
+            $query->orWhere([
+                ['b.payment_type', 0],
+            ]);
+        });
         $i->orderBy('b.id','DESC');
         $booking = $i->get();
         
